@@ -2,7 +2,7 @@
  * @file    high-precision.h
  * @author  Dr.Alfred (fredbao1126@gmail.com)
  * @brief   high precision number header
- * @version 0.3 Beta version
+ * @version 0.4 Beta Version
  * @date    2022-10-23
  * 
  * @copyright Copyright (c) 2019-2022 <Rhodes Island Inc.>
@@ -34,7 +34,7 @@ typedef std::string       _init_string_T;
 typedef long long         _base_iter_Tp;
 
 #ifndef _HIGH_PRECISION_H_
-#define _HIGH_PRECISION_H_
+#define _HIGH_PRECISION_H_  /* NOTHING */
 
 struct highInt {
     private:
@@ -54,6 +54,17 @@ struct highInt {
             }
             if (DEBUG_MODE) {
                 printf("Deleted leading zeros*%d\n", delCnt);
+            }
+        }
+
+        /**
+         * @brief check if self is -0
+         * 
+         * REPBUG 3: -0 bug
+         */
+        inline void checkNeg0() {
+            if (isNeg && __metadata.size() == 1ULL && __metadata[0] == 0) {
+                isNeg = false;
             }
         }
 
@@ -95,6 +106,7 @@ struct highInt {
                 }
                 putchar('\n');
             }
+            checkNeg0();
         }
 
     public:
@@ -129,6 +141,7 @@ struct highInt {
                 __metadata.push_back(__init[_i] - '0');
             }
             _processLeadingZeros();
+            checkNeg0();
             print_invalid: 
             if (HP_ALLOW_WARNING) {
                 printf("Warning! highInt initial has been given invalid arguments: string %s\n", __init.c_str());
@@ -171,6 +184,7 @@ struct highInt {
             __metadata = __init;
             _handleCarry();
             _processLeadingZeros();
+            checkNeg0();
         }
 
         /**
@@ -201,11 +215,11 @@ struct highInt {
                 __metadata.push_back(_readCache - '0');
             }
             _processLeadingZeros();
+            checkNeg0();
         }
 
         /**
          * @brief Print the item
-         * 
          */
         inline void print() {
             if (isNeg) {
@@ -448,6 +462,9 @@ struct highInt {
          * @return const highInt 
          */
         inline const highInt operator/(highInt _ano) const {
+            if ((*this) == 0) {
+                return highInt(0);
+            }
             bool _isNeg = isNeg ^ _ano.isNegative();
             // 绝对值相除
             highInt now = 0, ans;
@@ -474,7 +491,7 @@ struct highInt {
          * @return const highInt 
          */
         inline const highInt operator%(highInt _ano) const {
-            
+            return highInt(114514);
         }
 };
 
@@ -518,4 +535,3 @@ inline highInt abs(highInt _a) {
 }
 
 #endif // !_HIGH_PRECISION_H_   
-// NEXT: 整数计算器: 项
