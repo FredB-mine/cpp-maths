@@ -1,7 +1,7 @@
 /**
  * @file    high-precision.h
  * @author  Dr.Alfred (fredbao1126@gmail.com)
- * @brief   high precision number header
+ * @brief   high precision number header (may be used by Vexah)
  * @version 0.4 Beta Version
  * @date    2022-10-23
  * 
@@ -491,7 +491,23 @@ struct highInt {
          * @return const highInt 
          */
         inline const highInt operator%(highInt _ano) const {
-            return highInt(114514);
+            if ((*this) == 0) {
+                return highInt(0);
+            }
+            bool _isNeg = isNeg ^ _ano.isNegative();
+            // 绝对值相除
+            highInt now = 0, ans;
+            long long cnt = 0;
+            for (size_t i = 0; i < __metadata.size(); i++) {
+                now = now * 10 + __metadata[i];
+                cnt = 0;
+                while (_ano <= now) {
+                    ++cnt;
+                    now = now - _ano;
+                }
+                ans = ans * 10 + cnt;
+            }
+            return now;
         }
 };
 
@@ -532,6 +548,12 @@ inline void scanHighInt(highInt &_src) {
 inline highInt abs(highInt _a) {
     _hp_base_MetaTp _t = _a._get_M_data();
     return highInt(false, _t);
+}
+
+const highInt __high0 = highInt(0);
+
+inline highInt gcd(highInt _a, highInt _b) {
+    return (_b == __high0) ? _a : gcd(_b, a % b);
 }
 
 #endif // !_HIGH_PRECISION_H_   
