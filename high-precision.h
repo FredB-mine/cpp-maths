@@ -2,7 +2,7 @@
  * @file    high-precision.h
  * @author  Dr.Alfred (fredbao1126@gmail.com)
  * @brief   high precision number header (may be used by Vexah)
- * @version 0.4 Beta Version
+ * @version 0.5 Beta Version
  * @date    2022-10-23
  * 
  * @copyright Copyright (c) 2019-2022 <Rhodes Island Inc.>
@@ -21,6 +21,7 @@
  */
 
 #define  ALLOW_LEADING_ZERO     0
+#define  AUTO_FLOOR             0
 #define  DEBUG_MODE             0
 #define  DEFAULT_INIT_ZERO      1
 #define  HP_ALLOW_WARNING       0
@@ -453,7 +454,7 @@ struct highInt {
             return highInt(_isNeg, __tmp);
         }
 
-        // @todo / % gcd, lcm
+        // @todo better division efficiency
 
         /**
          * @brief division between two highInts
@@ -478,7 +479,7 @@ struct highInt {
                 }
                 ans = ans * 10 + cnt;
             }
-            if (now * 2 > _ano) {
+            if ((!AUTO_FLOOR) && (now * 2 > ans)) {
                 ans = ans + 1;
             }
             return ans * (_isNeg ? -1 : 1);
@@ -494,7 +495,6 @@ struct highInt {
             if ((*this) == 0) {
                 return highInt(0);
             }
-            bool _isNeg = isNeg ^ _ano.isNegative();
             // 绝对值相除
             highInt now = 0, ans;
             long long cnt = 0;
@@ -510,6 +510,26 @@ struct highInt {
             return now;
         }
 };
+
+inline highInt operator+(long long _left, highInt &_right) {
+    return highInt(_left) + _right;
+}
+
+inline highInt operator-(long long _left, highInt _right) {
+    return highInt(_left) - _right;
+}
+
+inline highInt operator*(long long _left, highInt _right) {
+    return highInt(_left) * _right;
+}
+
+inline highInt operator/(long long _left, highInt _right) {
+    return highInt(_left) / _right;
+}
+
+inline highInt operator%(long long _left, highInt _right) {
+    return highInt(_left) % _right;
+}
 
 inline highInt scanHighInt() {
     char _readCache;
@@ -553,7 +573,11 @@ inline highInt abs(highInt _a) {
 const highInt __high0 = highInt(0);
 
 inline highInt gcd(highInt _a, highInt _b) {
-    return (_b == __high0) ? _a : gcd(_b, a % b);
+    return (_b == __high0) ? _a : gcd(_b, _a % _b);
+}
+
+inline highInt lcm(highInt a, highInt b) {
+    return a / gcd(a, b) * b;
 }
 
 #endif // !_HIGH_PRECISION_H_   
